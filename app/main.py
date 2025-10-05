@@ -1,74 +1,39 @@
-from fastapi import FastAPI, Query
-from fastapi.responses import JSONResponse
-from app.src.web_crawler.crawler_spider.crawler import Crawler
-from app.src.web_crawler.indexer.indexer import Indexer
-# from app.src.recommender.recommender import Recommender
-import threading
-import time
-import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.routers import search_route, user_route, crawler_route
+from app.utils.logger import setup_logger
 
+# Setup logger
+logger = setup_logger()
 
-app = FastAPI(title="Bharat Search Engine")
-script_dir = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(script_dir, "src","web_crawler", "crawler_spider", "storage.db")
+app = FastAPI(
+    title="Rural India Search Engine",
+    description="A personalized search engine for rural Indian users",
+    version="1.0.0"
+)
 
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Singletons
-indexer = Indexer(db_path=DB_PATH)
-# recommender = Recommender(db_path=DB_PATH)
-crawler = Crawler(db_path=DB_PATH)
-
-
-# Helper: ensure DB/index exists
-indexer.ensure_tables()
-# recommender.ensure_tables()
-
+# Include routers
+app.include_router(search_route.APIRouter, prefix="/api/v1", tags=["search"])
+app.include_router(user_route.APIRouter, prefix="/api/v1", tags=["users"])
+app.include_router(crawler_route.APIRouter, prefix="/api/v1", tags=["crawl"])
 
 @app.get("/")
-def root():
-    return {"message": "Bharat Search Engine — hit /search?q=..."}
-
+async def root():
+    return {"message": "Rural India Search Engine API", "status": "running"}
 
 @app.get("/health")
-def health():
-    return {"status": "ok", "has_data": indexer.has_pages()}
+async def health_check():
+    return {"status": "healthy", "service": "search-engine"}
 
-
-@app.get("/search")
-def search(q: str = Query(..., min_length=1), category: str = Query(None)):
-# log query
-    indexer.log_search(q)
-
-
-    # If no data, trigger crawler synchronously (auto-init). This is simple and transparent.
-    if not indexer.has_pages():
-    # start crawler in a thread but wait until some pages are available or timeout
-        crawl_thread = threading.Thread(target=crawler.run_crawl(), kwargs={})
-        crawl_thread.start()
-    # Return a message indicating crawling started and ask client to retry in a few seconds.
-    # For UX, we'll block up to 45 seconds to try to return results after initial crawl progress.
-    timeout = 45
-    waited = 0
-    while waited < timeout:
-        if indexer.has_pages():
-            break
-        time.sleep(1)
-        waited += 1
-        # proceed whether or not pages appear
-
-
-    results = indexer.search(q, category=category, limit=20)
-    # feed reading history sample (no click info yet)
-    return JSONResponse({"query": q, "results": results})
-
-
-# @app.get("/recommend")
-# def recommend(user_id: str = Query(None)):
-# # for simplicity: user_id optional; uses aggregate trending if not provided
-#     feed = recommender.recommend(user_id=user_id)
-#     return {"recommendations": feed}
-
-
-@app.get("/popular")
-def popular(limit: int = 10):
-    return {"popular": indexer.get_popular_searches(limit=limit)}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
