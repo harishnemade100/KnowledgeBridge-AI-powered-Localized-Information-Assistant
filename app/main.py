@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import search_route, user_route, crawler_route
 from app.utils.logger import setup_logger
+from app.src.web_crawler.indexer.indexer import Indexer
+
+search_engine = Indexer()
+search_engine.ensure_tables()
 
 # Setup logger
 logger = setup_logger()
@@ -22,9 +26,9 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(search_route.APIRouter, prefix="/api/v1", tags=["search"])
-app.include_router(user_route.APIRouter, prefix="/api/v1", tags=["users"])
-app.include_router(crawler_route.APIRouter, prefix="/api/v1", tags=["crawl"])
+app.include_router(search_route.router, prefix="/api/v1", tags=["search"])
+app.include_router(user_route.router, prefix="/api/v1", tags=["users"])
+app.include_router(crawler_route.router, prefix="/api/v1", tags=["crawl"])
 
 @app.get("/")
 async def root():

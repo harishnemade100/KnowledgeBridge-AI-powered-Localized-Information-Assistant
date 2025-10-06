@@ -73,12 +73,9 @@ class EnhancedCrawler:
         for attempt in range(max_retries):
             try:
                 headers = {
-                    "User-Agent": self._get_random_user_agent(),
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                    "Accept-Language": "en-US,en;q=0.5",
-                    "Accept-Encoding": "gzip, deflate",
-                    "Connection": "keep-alive",
-                    "Upgrade-Insecure-Requests": "1",
+                "User-Agent": self._get_random_user_agent(),
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
                 }
                 
                 print(f"Fetching: {url} (Attempt {attempt+1}/{max_retries})")
