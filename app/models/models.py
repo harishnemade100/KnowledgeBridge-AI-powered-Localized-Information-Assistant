@@ -16,3 +16,4 @@ class SearchResponseItem(BaseModel):
     summary: str
     category: str
     language: str
+    score: Optional[float] = None
