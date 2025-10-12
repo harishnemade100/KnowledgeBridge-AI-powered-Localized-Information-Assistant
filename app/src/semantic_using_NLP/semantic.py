@@ -2,7 +2,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import joblib
 import os
-import numpy as np
 from database import db_connect
 
 EMBED_PATH = "embeddings.joblib"
