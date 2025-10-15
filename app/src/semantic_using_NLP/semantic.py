@@ -2,7 +2,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import joblib
 import os
-from database import db_connect
+from app.src.web_crawler.indexer.indexer import db_connect
+from scipy.sparse import csr_matrix
 
 EMBED_PATH = "embeddings.joblib"
 
@@ -30,7 +31,7 @@ def build_embeddings(force_rebuild=False):
     conn.close()
     if not texts:
         vectorizer = TfidfVectorizer(stop_words='english', max_features=20000)
-        matrix = vectorizer.fit_transform([""])  # empty matrix fallback
+        matrix = csr_matrix((0, 0))   # empty matrix fallback
         joblib.dump({"vectorizer": vectorizer, "matrix": matrix, "doc_ids": doc_ids}, EMBED_PATH)
         return vectorizer, matrix, doc_ids
     vectorizer = TfidfVectorizer(stop_words='english', max_features=20000)
