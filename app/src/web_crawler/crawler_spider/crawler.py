@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from seeds import PRIMARY_SEEDS, TRUSTED_SUFFIXES
+from app.src.web_crawler.crawler_spider.seeds import PRIMARY_SEEDS , TRUSTED_SUFFIXES
 from app.src.web_crawler.indexer.indexer import db_connect
 
 DEFAULT_TIMEOUT = 12
@@ -131,8 +131,8 @@ class EnhancedCrawler:
             conn.close()
             return False
         cur.execute(
-            """INSERT INTO pages (url, title, summary, content, category, language, content_hash)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT OR IGNORE INTO pages (url, title, summary, content, category, language, content_hash)
+            VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (url, title, summary, content, category, language, content_hash)
         )
         conn.commit()

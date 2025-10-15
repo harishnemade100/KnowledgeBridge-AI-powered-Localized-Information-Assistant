@@ -3,13 +3,13 @@ from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Query
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import List, Optional
 from datetime import datetime
-from database import init_db, db_connect
-from models import RegisterModel, CrawlRequest, SearchResponseItem
-from auth import create_jwt, hash_password, verify_password
-from crawler import EnhancedCrawler
-from utils import extract_faqs
-from semantic import build_embeddings, semantic_rank
-from scheduler import AutoRefresher
+from app.src.web_crawler.indexer.indexer import init_db, db_connect
+from app.models.models import RegisterModel, CrawlRequest, SearchResponseItem
+from app.src.auth.auth import create_jwt, hash_password, verify_password
+from app.src.web_crawler.crawler_spider.crawler import EnhancedCrawler
+from app.utils.utils import extract_faqs
+from app.src.semantic_using_NLP.semantic import build_embeddings, semantic_rank
+from app.utils.scheduler import AutoRefresher
 
 app = FastAPI(title="KnowledgeBridge - Crawler + Semantic Search API")
 
