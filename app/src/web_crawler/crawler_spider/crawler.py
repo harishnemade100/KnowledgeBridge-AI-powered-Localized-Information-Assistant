@@ -4,7 +4,8 @@ import time
 import socket
 import hashlib
 from typing import List, Optional
-import requests
+import requests.utils
+from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
